@@ -7,53 +7,41 @@ trigger:
 - main
 
 pool:
-  vmImage: windows-latest
-
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  webAppName: 'skeda1'
-  resourceGroupName: 'sw'
-  location: 'East US'
+  vmImage: window-latest
 
 steps:
-- task: UseDotNet@2
-  inputs:
-    version: '7.x'
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Restore NuGet packages'
-  inputs:
-    command: 'restore'
-    projects: '$(solution)'
-    feedsToUse: 'select'
-    vstsFeed: '<your-VSTS-feed-ID>'
-    includeNuGetOrg: true
-
-- task: DotNetCoreCLI@2
-  displayName: 'Build the application'
+  displayName: 'Build the ASP.NET Core application'
   inputs:
     command: 'build'
-    projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration)'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish the application'
+  displayName: 'Run unit tests'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish the ASP.NET Core application'
   inputs:
     command: 'publish'
-    publishWebProjects: true
-    projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: true
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-- task: AzureRmWebAppDeployment@4
-  displayName: 'Deploy to Azure App Service'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish the build artifacts'
   inputs:
-    ConnectionType: 'AzureRM'
-    azureSubscription: '14b07d2a-dd5a-4380-999b-eac9f6d6112f'
-    appType: 'webApp'
-    WebAppName: '$(skeda1)'
-    packageForLinux: '$(Build.ArtifactStagingDirectory)/{your-app-name}.zip'
-    ResourceGroupName: '$(sw)'
-    regionName: '$(EAST US2)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'code'
