@@ -13,8 +13,8 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  webAppName: 'your-web-app-name'
-  resourceGroupName: 'your-resource-group-name'
+  webAppName: 'skeda1'
+  resourceGroupName: 'sw'
   location: 'East US'
 
 steps:
