@@ -55,5 +55,5 @@ steps:
     appType: 'webApp'
     WebAppName: '$(webAppName)'
     packageForLinux: '$(Build.ArtifactStagingDirectory)/{your-app-name}.zip'
-    ResourceGroupName: '$(resourceGroupName)'
-    regionName: '$(location)'
+    ResourceGroupName: '$(sw)'
+    regionName: '$(EAST US2)'
