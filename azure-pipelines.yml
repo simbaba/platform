@@ -53,7 +53,7 @@ steps:
     ConnectionType: 'AzureRM'
     azureSubscription: '14b07d2a-dd5a-4380-999b-eac9f6d6112f'
     appType: 'webApp'
-    WebAppName: '$(webAppName)'
+    WebAppName: '$(skeda1)'
     packageForLinux: '$(Build.ArtifactStagingDirectory)/{your-app-name}.zip'
     ResourceGroupName: '$(sw)'
     regionName: '$(EAST US2)'
