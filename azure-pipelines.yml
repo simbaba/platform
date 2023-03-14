@@ -3,45 +3,27 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+# Set the resource group name
+resourceGroupName='sw'
 
-pool:
-  vmImage: window-latest
+# Set the SQL server name and admin credentials
+sqlServerName='skeda-server'
+sqlAdminUsername='skeda-login'
+sqlAdminPassword='Simeon@123?'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# Set the SQL database name
+sqlDatabaseName='sked'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# Set the App Service name
+appServiceName='skeda1'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Build the ASP.NET Core application'
-  inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
+# Get the connection string for the SQL database
+sqlServerFqdn=$(az sql server show --name $sqlServerName --resource-group $resourceGroupName --query fullyQualifiedDomainName -o tsv)
+sqlDatabaseConnectionString="Server=$sqlServerFqdn;Database=$sqlDatabaseName;User Id=$sqlAdminUsername;Password=$sqlAdminPassword;Encrypt=true;"
 
-- task: DotNetCoreCLI@2
-  displayName: 'Run unit tests'
-  inputs:
-    command: 'test'
-    projects: '**/*Tests.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Publish the ASP.NET Core application'
-  inputs:
-    command: 'publish'
-    projects: '**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish the build artifacts'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'code'
+# Configure the App Service with the SQL database connection string
+az webapp config connection-string set \
+    --name $appServiceName \
+    --resource-group $resourceGroupName \
+    --connection-string-type SQLAzure \
+    --settings 'DbConnectionString'="$sqlDatabaseConnectionString"
